@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us - News263 Harare </title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+  <!-- Header -->
+  <header class="bg-blue-700 text-white py-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-3xl font-bold">News263 Harare </h1>
+      <!-- Mobile Menu Button -->
+      <button id="menu-button" class="block md:hidden text-white text-2xl">
+        &#9776;
+      </button>
+      <nav id="menu" class="hidden md:flex space-x-4">
+        <a href="index.html" class="hover:underline">Home</a>
+        <a href="about.html" class="hover:underline">About</a>
+        <a href="categories.html" class="hover:underline">Categories</a>
+        <a href="contact.html" class="hover:underline">Contact</a>
+        <a href="admin.html" class="hover:underline">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <script>
+    // Mobile Menu Toggle
+    const menuButton = document.getElementById('menu-button');
+    const menu = document.getElementById('menu');
+    menuButton.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+    });
+  </script>
+
+  <!-- Main Content (About Page) -->
+  <main class="container mx-auto my-6 px-4">
+    <h2 class="text-2xl font-bold mb-4 text-center md:text-left">About Us</h2>
+    <p class="text-gray-700 leading-relaxed text-justify">
+      Welcome to News263 Harare , your trusted source for the latest news from Zimbabwe and around the world. Our mission is to keep you informed with accurate, timely, and relevant news, bringing you closer to the stories that matter most.
+    </p>
+    <p class="text-gray-700 leading-relaxed mt-4 text-justify">
+      We combine cutting-edge technology with dedicated journalism to deliver news in real-time. From breaking headlines to in-depth analysis, we ensure every article is carefully curated to provide you with the information you need.
+    </p>
+    <p class="text-gray-700 leading-relaxed mt-4 text-justify">
+      Our platform also allows for user interaction, enabling you to share your thoughts and opinions on the latest stories. Join us as we strive to build an informed and engaged community.
+    </p>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-blue-700 text-white py-4">
+    <div class="container mx-auto text-center px-4">
+      <p>&copy; 2025 News263 Harare . All Rights Reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

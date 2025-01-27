@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Categories - News263 Harare</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <style>
+    #map {
+      height: 300px;
+      border-radius: 0.5rem;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <!-- Header -->
+  <header class="bg-blue-700 text-white py-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-3xl font-bold">News263 Harare</h1>
+      <!-- Mobile Menu Button -->
+      <button id="menu-button" class="block md:hidden text-white text-2xl">
+        &#9776;
+      </button>
+      <nav id="menu" class="hidden md:flex space-x-4">
+        <a href="index.html" class="hover:underline">Home</a>
+        <a href="about.html" class="hover:underline">About</a>
+        <a href="categories.html" class="hover:underline">Categories</a>
+        <a href="contact.html" class="hover:underline">Contact</a>
+        <a href="admin.html" class="hover:underline">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <script>
+    // Mobile Menu Toggle
+    const menuButton = document.getElementById('menu-button');
+    const menu = document.getElementById('menu');
+    menuButton.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+    });
+  </script>
+
+  <!-- Main Content (Categories Page) -->
+  <main class="container mx-auto my-6 px-4">
+    <h2 class="text-2xl font-bold mb-4 text-center md:text-left">News Categories</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <!-- Category Cards -->
+      <div class="bg-white shadow-md rounded-lg p-4">
+        <h3 class="text-xl font-bold">Local News</h3>
+        <p class="text-gray-700 mt-2">Stay updated on the latest developments and stories from Zimbabwe.</p>
+        <a href="#" onclick="fetchLocalNews()" class="text-blue-500 hover:underline mt-2 inline-block">Explore Local News</a>
+      </div>
+      <div class="bg-white shadow-md rounded-lg p-4">
+        <h3 class="text-xl font-bold">Regional News</h3>
+        <p class="text-gray-700 mt-2">Find out what's happening across neighboring regions and countries.</p>
+        <a href="#" onclick="fetchRegionalNews()" class="text-blue-500 hover:underline mt-2 inline-block">Explore Regional News</a>
+      </div>
+      <div class="bg-white shadow-md rounded-lg p-4">
+        <h3 class="text-xl font-bold">Global News</h3>
+        <p class="text-gray-700 mt-2">Get insights and updates on international news and events.</p>
+        <a href="#" onclick="fetchGlobalNews()" class="text-blue-500 hover:underline mt-2 inline-block">Explore Global News</a>
+      </div>
+    </div>
+
+    <!-- Map Section -->
+    <div id="map-container" class="mt-6">
+      <h2 id="map-title" class="text-2xl font-bold mb-4 text-center">Featured News</h2>
+      <div id="map" class="bg-gray-200 flex items-start justify-left rounded-lg overflow-hidden">
+        <div id="featured-news" class="text-center">
+          <p class="text-gray-500">Loading featured news...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- News Container -->
+    <div id="news-container" class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <!-- Dynamic news articles will load here -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-blue-700 text-white py-4">
+    <div class="container mx-auto text-center px-4">
+      <p>&copy; 2025 News263 Harare. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <!-- News Aggregation Script -->
+  <script>
+    const localAPIURL = "http://localhost:5000/api/articles"; // Local database endpoint
+    const newsContainer = document.getElementById("news-container");
+    let map, activeCategory = null;
+
+    // Initialize map
+    function initializeMap(lat, lng, zoom, title) {
+      const featuredNewsContainer = document.getElementById("featured-news");
+      featuredNewsContainer.innerHTML = ""; // Clear featured news
+
+      if (map) {
+        map.remove();
+      }
+
+      document.getElementById("map-title").textContent = title;
+      map = L.map("map").setView([lat, lng], zoom);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 18,
+      }).addTo(map);
+    }
+
+    // Fetch Featured News from Database
+    async function fetchFeaturedNews() {
+      const featuredNewsContainer = document.getElementById("featured-news");
+      featuredNewsContainer.innerHTML = '<p class="text-gray-500">Loading featured news...</p>';
+
+      try {
+        const response = await fetch(`${localAPIURL}?_sort=createdAt&_order=desc&_limit=1`);
+        const articles = await response.json();
+
+        if (articles.length > 0) {
+          const featuredArticle = articles[0]; // Most recent article
+          featuredNewsContainer.innerHTML = `
+            <div class="relative w-full h-full flex items-start">
+              <!-- Image -->
+              <div class="w-2/3" style="margin: 0; padding: 0;">
+                <img src="${featuredArticle.image || 'https://via.placeholder.com/800x600?text=No+Image'}" 
+                    alt="${featuredArticle.title}" 
+                    class="w-full object-cover rounded-lg" 
+                    style="height: 300px; margin: 0;">
+              </div>
+
+              <!-- Title and Description -->
+              <div class="w-1/3 pl-4" style="margin: 0;">
+                <h3 class="text-xl font-bold text-left">${featuredArticle.title}</h3>
+                <p class="text-gray-700 mt-2 text-left">${featuredArticle.content.substring(0, 200)}...</p>
+                <!-- <a href="#" class="text-blue-500 underline mt-4 inline-block text-left">Read More</a> -->
+              </div>
+            </div>
+
+          `;
+        } else {
+          featuredNewsContainer.innerHTML = `<p class="text-gray-500">No featured news available.</p>`;
+        }
+      } catch (error) {
+        console.error("Error fetching featured news:", error);
+        featuredNewsContainer.innerHTML = `<p class="text-red-500">Failed to load featured news. Please try again later.</p>`;
+      }
+    }
+
+    // Fetch RSS Function (unchanged)
+    async function fetchRSS(feedURL) {
+      newsContainer.innerHTML = '<p class="text-gray-700">Loading news...</p>';
+      try {
+        const response = await fetch(feedURL);
+        const data = await response.json();
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(data.contents, "text/xml");
+        const items = xml.querySelectorAll("item");
+
+        if (items.length > 0) {
+          newsContainer.innerHTML = Array.from(items)
+            .slice(0, 12)
+            .map(
+              (item) => `
+              <div class="bg-white shadow-md rounded-lg p-4">
+                <h3 class="text-xl font-bold mt-2">${item.querySelector("title").textContent}</h3>
+                <p class="text-gray-700 mt-2">${
+                  item.querySelector("description")?.textContent || "No description available."
+                }</p>
+                <a href="${item.querySelector("link").textContent}" target="_blank" class="text-blue-500 hover:underline mt-2 inline-block">Read More</a>
+              </div>
+            `
+            )
+            .join("");
+        } else {
+          newsContainer.innerHTML = '<p class="text-gray-700">No news articles available.</p>';
+        }
+      } catch (error) {
+        console.error("Error fetching RSS feed:", error);
+        newsContainer.innerHTML =
+          '<p class="text-red-500">Failed to load news. Please try again later.</p>';
+      }
+    }
+
+    // Functions for each category
+    function fetchLocalNews() {
+      initializeMap(-17.824858, 31.053028, 6, "Zimbabwe Map");
+      fetchRSS(localRSS);
+    }
+
+    function fetchRegionalNews() {
+      initializeMap(1.373333, 32.290275, 3, "Africa Map");
+      fetchRSS(regionalRSS);
+    }
+
+    function fetchGlobalNews() {
+      initializeMap(20, 0, 2, "World Map");
+      fetchRSS(globalRSS);
+    }
+
+    // On load, fetch featured news
+    window.onload = fetchFeaturedNews;
+  </script>
+</body>
+</html>

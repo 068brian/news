@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News Today</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+  <!-- Header -->
+  <header class="bg-blue-700 text-white py-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-3xl font-bold">News Today</h1>
+      <!-- Hamburger Menu for Mobile -->
+      <button id="menu-button" class="block md:hidden text-white text-2xl">
+        &#9776;
+      </button>
+      <nav id="menu" class="hidden md:flex space-x-4">
+        <a href="index.html" class="hover:underline">Home</a>
+        <a href="about.html" class="hover:underline">About</a>
+        <a href="categories.html" class="hover:underline">Categories</a>
+        <a href="contact.html" class="hover:underline">Contact</a>
+        <a href="admin.html" class="hover:underline">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <script>
+    // Mobile Menu Toggle
+    const menuButton = document.getElementById('menu-button');
+    const menu = document.getElementById('menu');
+    menuButton.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+    });
+  </script>
+
+  <!-- Main Content (Home Page) -->
+  <main class="container mx-auto my-6 px-4">
+    <h2 class="text-2xl font-bold mb-4 text-center md:text-left">Latest News</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <!-- News Articles -->
+      <div class="bg-white shadow-md rounded-lg p-4">
+        <img src="https://via.placeholder.com/150" alt="News Image" class="w-full h-48 object-cover rounded-md">
+        <h3 class="text-xl font-bold mt-2">News Title 1</h3>
+        <p class="text-gray-700 mt-2">This is a brief description of the news article...</p>
+        <a href="#" class="text-blue-500 hover:underline mt-2 inline-block">Read More</a>
+      </div>
+      <div class="bg-white shadow-md rounded-lg p-4">
+        <img src="https://via.placeholder.com/150" alt="News Image" class="w-full h-48 object-cover rounded-md">
+        <h3 class="text-xl font-bold mt-2">News Title 2</h3>
+        <p class="text-gray-700 mt-2">This is another brief description...</p>
+        <a href="#" class="text-blue-500 hover:underline mt-2 inline-block">Read More</a>
+      </div>
+      <div class="bg-white shadow-md rounded-lg p-4">
+        <img src="https://via.placeholder.com/150" alt="News Image" class="w-full h-48 object-cover rounded-md">
+        <h3 class="text-xl font-bold mt-2">News Title 3</h3>
+        <p class="text-gray-700 mt-2">Another piece of breaking news...</p>
+        <a href="#" class="text-blue-500 hover:underline mt-2 inline-block">Read More</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-blue-700 text-white py-4">
+    <div class="container mx-auto text-center px-4">
+      <p>&copy; 2025 News Today. All Rights Reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

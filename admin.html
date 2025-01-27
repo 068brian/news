@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - News263 Harare</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Fetch and render articles from the backend
+    async function fetchArticles() {
+      const response = await fetch('http://localhost:5000/api/articles');
+      const articles = await response.json();
+
+      const articlesList = document.getElementById('articles-list');
+      articlesList.innerHTML = ''; // Clear the list
+
+      articles.forEach(article => {
+        const articleItem = `
+          <li class="bg-white shadow-md rounded-lg p-4 flex items-center space-x-4" data-id="${article._id}">
+            <img src="${article.image}" alt="${article.title}" class="w-32 h-32 object-cover rounded-md">
+            <div>
+              <h4 class="text-lg font-bold">${article.title}</h4>
+              <p class="text-gray-700">${article.content.substring(0, 100)}...</p>
+              <div class="mt-2 flex space-x-4">
+                <button onclick="deleteArticle('${article._id}')" class="bg-red-600 text-white py-1 px-3 rounded-md hover:bg-red-700">Delete</button>
+                <button onclick="editArticle('${article._id}', '${article.title}', '${article.image}', '${article.content}')" class="bg-green-600 text-white py-1 px-3 rounded-md hover:bg-green-700">Edit</button>
+              </div>
+            </div>
+          </li>
+        `;
+        articlesList.insertAdjacentHTML('beforeend', articleItem);
+      });
+    }
+
+    // Add a new article
+    async function addArticle(event) {
+      event.preventDefault();
+
+      const title = document.getElementById('title').value;
+      const image = document.getElementById('image').value;
+      const content = document.getElementById('content').value;
+
+      await fetch('http://localhost:5000/api/articles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, image, content }),
+      });
+
+      document.getElementById('title').value = '';
+      document.getElementById('image').value = '';
+      document.getElementById('content').value = '';
+
+      fetchArticles(); // Refresh the article list
+    }
+
+    // Delete an article
+    async function deleteArticle(id) {
+      await fetch(`http://localhost:5000/api/articles/${id}`, { method: 'DELETE' });
+      fetchArticles(); // Refresh the article list
+    }
+
+    // Edit an article
+    async function editArticle(id, title, image, content) {
+      document.getElementById('title').value = title;
+      document.getElementById('image').value = image;
+      document.getElementById('content').value = content;
+
+      const submitButton = document.querySelector('form button');
+      submitButton.textContent = 'Update Article';
+      submitButton.onclick = async function (event) {
+        event.preventDefault();
+
+        const updatedTitle = document.getElementById('title').value;
+        const updatedImage = document.getElementById('image').value;
+        const updatedContent = document.getElementById('content').value;
+
+        await fetch(`http://localhost:5000/api/articles/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: updatedTitle, image: updatedImage, content: updatedContent }),
+        });
+
+        submitButton.textContent = 'Publish Article';
+        submitButton.onclick = addArticle;
+
+        document.getElementById('title').value = '';
+        document.getElementById('image').value = '';
+        document.getElementById('content').value = '';
+
+        fetchArticles(); // Refresh the article list
+      };
+    }
+
+    // Initial fetch on page load
+    document.addEventListener('DOMContentLoaded', fetchArticles);
+  </script>
+</head>
+<body class="bg-gray-100">
+  <!-- Header -->
+  <header class="bg-blue-700 text-white py-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-3xl font-bold">News263 Harare</h1>
+      <nav class="space-x-4">
+        <a href="index.html" class="hover:underline">Home</a>
+        <a href="about.html" class="hover:underline">About</a>
+        <a href="categories.html" class="hover:underline">Categories</a>
+        <a href="contact.html" class="hover:underline">Contact</a>
+        <a href="admin.html" class="hover:underline">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content (Admin Page) -->
+  <main class="container mx-auto my-6 px-4">
+    <h2 class="text-2xl font-bold mb-6">Admin Panel</h2>
+
+    <!-- Form to Add/Edit News -->
+    <section class="mb-10">
+      <h3 class="text-xl font-bold mb-4">Add/Edit Article</h3>
+      <form class="bg-white shadow-md rounded-lg p-6 space-y-4" onsubmit="addArticle(event)">
+        <div>
+          <label for="title" class="block text-gray-700 font-bold mb-2">News Title</label>
+          <input type="text" id="title" class="w-full p-3 border rounded-md" placeholder="Enter news title" required>
+        </div>
+        <div>
+          <label for="image" class="block text-gray-700 font-bold mb-2">Image URL</label>
+          <input type="url" id="image" class="w-full p-3 border rounded-md" placeholder="Enter image URL">
+        </div>
+        <div>
+          <label for="content" class="block text-gray-700 font-bold mb-2">Content</label>
+          <textarea id="content" rows="5" class="w-full p-3 border rounded-md" placeholder="Enter the news content" required></textarea>
+        </div>
+        <button type="submit" class="bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800">
+          Publish Article
+        </button>
+      </form>
+    </section>
+
+    <!-- List of Articles -->
+    <section>
+      <h3 class="text-xl font-bold mb-4">Manage Articles</h3>
+      <ul id="articles-list" class="space-y-4">
+        <!-- Articles will be dynamically loaded here -->
+      </ul>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-blue-700 text-white py-4">
+    <div class="container mx-auto text-center px-4">
+      <p>&copy; 2025 News263 Harare. All Rights Reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

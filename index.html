@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News263 Harare</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+  <!-- Header -->
+  <header class="bg-blue-700 text-white py-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-3xl font-bold">News263 Harare</h1>
+      <!-- Hamburger Menu for Mobile -->
+      <button id="menu-button" class="block md:hidden text-white text-2xl">
+        &#9776;
+      </button>
+      <nav id="menu" class="hidden md:flex space-x-4">
+        <a href="index.html" class="hover:underline">Home</a>
+        <a href="about.html" class="hover:underline">About</a>
+        <a href="categories.html" class="hover:underline">Categories</a>
+        <a href="contact.html" class="hover:underline">Contact</a>
+        <a href="admin.html" class="hover:underline">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <script>
+    // Mobile Menu Toggle
+    const menuButton = document.getElementById('menu-button');
+    const menu = document.getElementById('menu');
+    menuButton.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+    });
+  </script>
+
+  <!-- Main Content (Home Page) -->
+  <main class="container mx-auto my-6 px-4">
+    <!-- Featured Post from Database -->
+    <div id="featured-post" class="bg-white shadow-md rounded-lg mb-6 p-4">
+      <h2 class="text-2xl font-bold mb-4">Featured Post</h2>
+      <div id="featured-post-content" class="flex items-center space-x-4">
+        <p class="text-gray-700">Loading Featured Post...</p>
+      </div>
+    </div>
+    <h2 class="text-2xl font-bold mb-4 text-center md:text-left">Latest News</h2>
+    <div id="news-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <!-- Dynamic news articles will load here -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-blue-700 text-white py-4">
+    <div class="container mx-auto text-center px-4">
+      <p>&copy; 2025 News263 Harare. All Rights Reserved.</p>
+    </div>
+  </footer>
+  <!-- Scripts -->
+  <script>
+    const localAPIURL = 'http://localhost:5000/api/articles'; // Local database endpoint
+
+    // Fetch the first post from the local database
+    async function fetchFeaturedPost() {
+      const featuredPostContainer = document.getElementById('featured-post-content');
+      try {
+        const response = await fetch(`${localAPIURL}?_sort=createdAt&_order=desc&_limit=1`);
+        const articles = await response.json();
+        if (articles.length > 0) {
+          const featuredArticle = articles[0];
+          featuredPostContainer.innerHTML = `
+            <div class="flex w-full">
+              <!-- Image on the Left -->
+              <div class="w-1/3">
+                <img src="${featuredArticle.image || 'https://via.placeholder.com/600x400?text=No+Image'}" 
+                  alt="${featuredArticle.title}" 
+                  class="w-full h-full object-cover rounded-lg">
+              </div>
+              <!-- Title and Description on the Right -->
+              <div class="w-2/3 pl-4">
+                <h3 class="text-xl font-bold">${featuredArticle.title}</h3>
+                <p class="text-gray-700 mt-2">${featuredArticle.content.substring(0, 200)}...</p>
+                <a href="#" class="text-blue-500 underline mt-4 inline-block">Read More</a>
+              </div>
+            </div>
+          `;
+        } else {
+          featuredPostContainer.innerHTML = `<p class="text-gray-700">No featured post available.</p>`;
+        }
+      } catch (error) {
+        console.error('Error fetching featured post:', error.message);
+        featuredPostContainer.innerHTML = `<p class="text-red-500">Failed to load featured post. Please try again later.</p>`;
+      }
+    }
+
+    fetchFeaturedPost(); // Fetch featured post from database
+  </script>
+  <!-- News Aggregation Script -->
+  <script>
+    const apiKey = '9e736c1ee9d342ad868a059186c0bf0f'; // Replace with your NewsAPI key
+    const zimbabweURL = `https://newsapi.org/v2/top-headlines?country=zw&apiKey=${apiKey}`;
+    const googleNewsURL = `https://newsapi.org/v2/everything?q=Google&apiKey=${apiKey}`;
+    const chronicleRSS = 'http://localhost:3000/rss';
+    const globalRSS = 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml';
+
+    // Fetch Google News
+    async function fetchGoogleNews() {
+      const googleNewsContainer = document.getElementById('google-news-content');
+      try {
+        const response = await fetch(googleNewsURL);
+        const data = await response.json();
+        if (data.articles && data.articles.length > 0) {
+          const featuredGoogleArticle = data.articles[0];
+          googleNewsContainer.innerHTML = `
+            <div class="relative w-full h-full rounded-lg overflow-hidden">
+              <img src="${featuredGoogleArticle.urlToImage || 'https://via.placeholder.com/600x400?text=No+Image'}" 
+                alt="${featuredGoogleArticle.title}" 
+                class="w-full h-full object-cover">
+              <div class="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 text-white p-4">
+                <h3 class="text-lg font-bold">${featuredGoogleArticle.title}</h3>
+                <p class="text-sm">${featuredGoogleArticle.description || 'No description available.'}</p>
+                <a href="${featuredGoogleArticle.url}" target="_blank" class="text-blue-300 underline mt-2 block">Read More</a>
+              </div>
+            </div>
+          `;
+        } else {
+          googleNewsContainer.innerHTML = `<p class="text-gray-700">No Google News available.</p>`;
+        }
+      } catch (error) {
+        console.error('Error fetching Google News:', error.message);
+        googleNewsContainer.innerHTML = `<p class="text-red-500">Failed to load Google News. Please try again later.</p>`;
+      }
+    }
+
+    fetchGoogleNews();
+
+    // Fetch NewsAPI Articles
+    fetch(zimbabweURL)
+      .then(response => response.json())
+      .then(data => {
+        const newsContainer = document.getElementById('news-container');
+        data.articles.forEach(article => {
+          const newsItem = `
+            <div class="bg-white shadow-md rounded-lg p-4">
+              <img src="${article.urlToImage || 'https://via.placeholder.com/150'}" alt="${article.title}" class="w-full h-48 object-cover rounded-md">
+              <h3 class="text-xl font-bold mt-2">${article.title}</h3>
+              <p class="text-gray-700 mt-2">${article.description || 'No description available.'}</p>
+              <a href="${article.url}" target="_blank" class="text-blue-500 hover:underline mt-2 inline-block">Read More</a>
+            </div>
+          `;
+          newsContainer.innerHTML += newsItem;
+        });
+      })
+      .catch(error => console.error('Error fetching Zimbabwean news:', error));
+
+    // Fetch RSS Articles
+    async function fetchRSS(feedURL) {
+      const RSSParser = new DOMParser();
+      const response = await fetch(feedURL);
+      const text = await response.text();
+      const xml = RSSParser.parseFromString(text, 'text/xml');
+      const items = xml.querySelectorAll('item');
+
+      const newsContainer = document.getElementById('news-container');
+      items.forEach(item => {
+        const title = item.querySelector('title').textContent;
+        const link = item.querySelector('link').textContent;
+        const description = item.querySelector('description').textContent;
+
+        const newsItem = `
+          <div class="bg-white shadow-md rounded-lg p-4">
+            <h3 class="text-xl font-bold mt-2">${title}</h3>
+            <p class="text-gray-700 mt-2">${description}</p>
+            <a href="${link}" target="_blank" class="text-blue-500 hover:underline mt-2 inline-block">Read More</a>
+          </div>
+        `;
+        newsContainer.innerHTML += newsItem;
+      });
+    }
+
+    // Fetch Global News RSS Feed
+    fetchRSS(globalRSS).catch(error => console.error('Error fetching RSS feed:', error));
+    // Fetch Chronicle RSS Feed
+    fetchRSS(chronicleRSS).catch(error => console.error('Error fetching Chronicle RSS feed:', error));
+  </script>
+</body>
+</html>
